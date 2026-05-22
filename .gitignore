@@ -1,0 +1,28 @@
+# macOS / Linux / editor cruft
+.DS_Store
+*.swp
+*.swo
+
+# IDEs
+.vscode/
+.idea/
+.fleet/
+.zed/
+
+# Node / build
+node_modules/
+*.log
+npm-debug.log*
+
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+
+# Cloudflare Wrangler local state
+.wrangler/
+
+# Deploy / build artifacts that shouldn't ship
+dist/
+.cache/

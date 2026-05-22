@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<!-- PUNZI - (c) 2026 Charu Punjani. Code MIT; see LICENSE. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Defense-in-depth CSP; primary enforcement at the gateway Worker layer. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://punzi-vote-collector.punziwars.workers.dev; frame-src 'self' https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+<script src="dispatcher.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PUNZI WARS — Vote for the 64</title>
+<meta name="description" content="300 tokens. 64 slots. Your vote decides which compete in the PUNZI Wars. A transparent mathematical game and on-chain experiment.">
+<meta name="theme-color" content="#0a0a0f">
+
+<!-- OG / Social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="PUNZI WARS — Vote for the 64">
+<meta property="og:description" content="300 tokens. 64 slots. Your vote decides which compete in the PUNZI Wars.">
+<meta property="og:image" content="https://punzi.xyz/raccoon/punzi-the-weaver.jpg">
+<meta property="og:url" content="https://punzi.xyz">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PUNZI WARS — Vote for the 64">
+<meta name="twitter:description" content="300 tokens. 64 slots. Your vote decides.">
+<meta name="twitter:image" content="https://punzi.xyz/raccoon/punzi-the-weaver.jpg">
+
+<link rel="icon" href="icon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#000000;
+  --surface:#0A0A0F;
+  --surface-raised:#12121A;
+  --purple:#6C5CE7;
+  --purple-secondary:#0984E3;
+  --purple-glow:rgba(108,92,231,0.4);
+  --gold:#FFD700;
+  --gold-dim:#B8960C;
+  --gold-glow:rgba(255,215,0,0.3);
+  --border:#1E1E2E;
+  --text-muted:#6B7280;
+  --text-secondary:#9CA3AF;
+  --white:#ffffff;
+  --green:#10B981;
+}
+
+body{
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  background: var(--bg);
+  color: var(--white);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection{background:var(--purple);color:white}
+
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-layer::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(108,92,231,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(255,215,0,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(108,92,231,0.06) 0%, transparent 50%);
+}
+
+.page{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;min-height:100dvh;
+  padding:2rem 1.25rem;
+  text-align:center;
+}
+
+.hero-wrap{
+  width:100%;max-width:42rem;margin:0 auto 2rem;
+  opacity:0;transform:translateY(20px);
+  animation:fadeUp 0.8s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.hero-frame{
+  position:relative;width:100%;aspect-ratio:3/2;
+  border-radius:1.25rem;overflow:hidden;
+  border:2px solid var(--border);
+  box-shadow:0 0 60px rgba(108,92,231,0.15),0 0 120px rgba(255,215,0,0.05);
+}
+.hero-frame::before{
+  content:'';position:absolute;inset:-2px;z-index:-1;
+  border-radius:inherit;
+  background:linear-gradient(135deg,var(--purple),var(--gold),var(--purple));
+  background-size:200% 200%;
+  animation:glowShift 4s ease infinite;
+  filter:blur(1px);
+}
+@keyframes glowShift{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+.hero-frame img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+
+@keyframes fadeUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+
+.title-block{margin-bottom:1.5rem;opacity:0;transform:translateY(20px);animation:fadeUp 0.8s 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+.title-main{font-size:clamp(2.5rem,8vw,4rem);font-weight:900;letter-spacing:-0.02em;line-height:1;
+  background:linear-gradient(135deg,#FFFFFF 0%,var(--gold) 40%,#FFFFFF 60%,var(--gold) 100%);
+  background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 24s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(255,215,0,0.3))}
+.title-sub{font-size:clamp(0.85rem,2vw,1.1rem);color:var(--text-secondary);margin-top:0.5rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:600}
+
+@keyframes shimmer{0%,100%{background-position:0% center}50%{background-position:200% center}}
+
+.tagline{margin-bottom:1.5rem;opacity:0;animation:fadeUp 0.8s 0.6s cubic-bezier(0.16,1,0.3,1) forwards}
+.stat-line{font-size:clamp(1rem,2.5vw,1.25rem);color:var(--text-secondary);font-weight:500;line-height:2}
+.stat-line .num{color:var(--gold);font-weight:700}
+.stat-line .chain{color:var(--purple);font-weight:700}
+
+.phase-indicator{
+  display:flex;align-items:center;gap:0.75rem;
+  margin-bottom:2rem;padding:0.75rem 1.5rem;
+  border-radius:9999px;border:1px solid var(--border);
+  background:var(--surface-raised);
+  opacity:0;animation:fadeUp 0.8s 0.7s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.phase-dot{width:8px;height:8px;border-radius:50%}
+.phase-dot.teaser{background:var(--purple);box-shadow:0 0 8px var(--purple-glow)}
+.phase-dot.voting{background:var(--green);box-shadow:0 0 8px rgba(16,185,129,0.4);animation:pulse 2s ease infinite}
+.phase-dot.reveal{background:var(--gold);box-shadow:0 0 8px var(--gold-glow)}
+.phase-dot.live{background:#EF4444;box-shadow:0 0 8px rgba(239,68,68,0.4);animation:pulse 2s ease infinite}
+.phase-text{font-size:0.8rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-secondary)}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+.vote-section{
+  width:100%;max-width:600px;margin:0 auto 2.5rem;
+  opacity:0;animation:fadeUp 0.8s 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.vote-card{
+  padding:2rem 1.5rem;border-radius:1.25rem;
+  border:1px solid var(--purple);
+  background:linear-gradient(135deg,rgba(108,92,231,0.08),rgba(255,215,0,0.04));
+  box-shadow:0 0 40px rgba(108,92,231,0.1);
+}
+.vote-title{font-size:1.25rem;font-weight:800;color:var(--white);margin-bottom:0.5rem}
+.vote-desc{font-size:0.9rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1.5rem}
+.vote-stats{display:flex;justify-content:center;gap:2rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.vote-stat{text-align:center}
+.vote-stat-num{font-size:1.5rem;font-weight:800;color:var(--gold)}
+.vote-stat-label{font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em}
+.vote-stats-note{font-size:0.68rem;color:var(--text-muted);text-align:center;margin:0.55rem auto 0;max-width:30rem;line-height:1.5}
+
+.vote-btn{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.95rem 2rem;border-radius:0.75rem;
+  background:linear-gradient(135deg,var(--purple),#7c6cf7);
+  color:white;font-weight:700;font-size:0.95rem;
+  text-decoration:none;border:none;cursor:pointer;
+  letter-spacing:0.05em;
+  box-shadow:0 4px 20px rgba(108,92,231,0.3);
+  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, background 0.25s ease;
+}
+.vote-btn:hover{
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 8px 30px rgba(108,92,231,0.55);
+  background:linear-gradient(135deg,#7c6cf7,var(--purple));
+}
+.vote-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.live-actions{display:flex;flex-direction:column;gap:0.6rem;align-items:center}
+@media(min-width:480px){.live-actions{flex-direction:row;justify-content:center;gap:0.75rem}}
+.vote-btn-ghost{background:transparent !important;border:1px solid rgba(255,255,255,0.2);color:var(--text-secondary) !important;box-shadow:none !important;font-weight:600 !important}
+.vote-btn-ghost:hover{background:rgba(255,255,255,0.05) !important;border-color:var(--gold);color:var(--white) !important;transform:translateY(-1px) !important}
+.vote-btn svg{width:18px;height:18px}
+
+.vote-round-info{
+  margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(108,92,231,0.2);
+  font-size:0.8rem;color:var(--text-muted);
+}
+
+.share-card{
+  margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(108,92,231,0.2);
+  font-size:0.8rem;text-align:center;
+}
+.share-prompt{
+  color:var(--text-secondary);margin:0 0 0.7rem;line-height:1.5;
+}
+.share-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:0.65rem 1.6rem;border-radius:0.5rem;
+  font-size:0.8rem;font-weight:700;font-family:inherit;cursor:pointer;
+  background:var(--purple);color:white;border:none;letter-spacing:0.02em;
+  transition:background 0.15s ease,transform 0.15s ease,border-color 0.15s ease;
+  text-decoration:none;min-width:200px;
+}
+.share-btn:hover{background:#7c6cf7;transform:translateY(-1px)}
+.share-btn-x{background:#000;border:1px solid rgba(255,255,255,0.2)}
+.share-btn-x:hover{background:#111;border-color:#fff}
+
+.ballot-submit{display:flex;flex-direction:column;align-items:center;gap:0.85rem;margin-top:0.25rem}
+.ballot-count{
+  font-size:0.95rem;font-weight:800;color:var(--gold);
+  letter-spacing:0.03em;font-variant-numeric:tabular-nums;transition:color 0.2s ease;
+}
+.ballot-count.limit{color:#EF4444;animation:ballotLimitFlash 1.4s ease}
+@keyframes ballotLimitFlash{0%,100%{opacity:1}30%{opacity:0.35}}
+.cf-turnstile{min-height:1px}
+#submitBallotBtn{cursor:pointer;border:none}
+#submitBallotBtn:disabled{
+  opacity:0.45;cursor:not-allowed;transform:none;box-shadow:none;
+  background:linear-gradient(135deg,#3a3550,#2c2a3e);
+}
+#submitBallotBtn:disabled:hover{transform:none;box-shadow:none}
+.ballot-status{font-size:0.8rem;line-height:1.5;min-height:1.2em;margin:0}
+.ballot-status.pending{color:var(--text-secondary)}
+.ballot-status.error{color:#EF4444}
+.ballot-status.ok{color:var(--green);font-weight:700}
+.ballot-hint{font-size:0.7rem;color:var(--text-muted);margin:0;line-height:1.5}
+.ballot-voted{
+  display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+  padding:1rem;border-radius:0.75rem;
+  border:1px solid var(--green);background:rgba(16,185,129,0.06);
+}
+.ballot-voted-title{font-size:1rem;font-weight:800;color:var(--green)}
+.ballot-voted-msg{font-size:0.8rem;color:var(--text-secondary);line-height:1.55}
+.token-browser .token-card{cursor:pointer}
+.token-card.selected{
+  border-color:var(--purple);
+  box-shadow:0 0 0 2px var(--purple),0 0 18px rgba(108,92,231,0.35);
+  background:linear-gradient(180deg,rgba(108,92,231,0.14),var(--surface-raised) 70%);
+}
+.token-card.selected::after{
+  content:'\2713';position:absolute;top:0.25rem;right:0.3rem;
+  width:1.05rem;height:1.05rem;border-radius:50%;
+  background:var(--purple);color:#fff;font-size:0.7rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+}
+.token-card.selected.in-64{border-color:var(--gold)}
+.token-card.selected .delta{right:1.55rem}
+
+.teaser{
+  max-width:540px;margin:0 auto 2rem;
+  opacity:0;animation:fadeUp 0.8s 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.teaser p{font-size:clamp(0.9rem,2vw,1.05rem);color:var(--text-secondary);line-height:1.7}
+
+.hook-banner{
+  text-align:center;margin-bottom:2.25rem;padding:1.5rem 1rem;
+  opacity:0;transform:translateY(20px);animation:fadeUp 0.9s 1.1s cubic-bezier(0.16,1,0.3,1) forwards;
+  position:relative;
+}
+.hook-banner::before,.hook-banner::after{
+  content:'';position:absolute;left:50%;transform:translateX(-50%);
+  width:100px;height:1px;opacity:0.5;
+}
+.hook-banner::before{top:0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.hook-banner::after{bottom:0;background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+.hook-line-1,.hook-line-2{font-size:clamp(1rem,2.8vw,1.6rem);font-weight:800;letter-spacing:0.1em;text-transform:uppercase;line-height:1.35;margin:0}
+.hook-line-1{
+  background:linear-gradient(135deg,#FFFFFF 0%,var(--gold) 50%,#FFFFFF 100%);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 24s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(255,215,0,0.25));
+}
+.hook-line-2{color:var(--purple);margin-top:0.35rem;text-shadow:0 0 25px rgba(108,92,231,0.5)}
+
+.countdown-stack{
+  width:100%;
+  max-width: 540px;
+  margin: 0 auto 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  opacity:0;
+  animation:fadeUp 0.8s 0.9s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.countdown-row{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease;
+  overflow: hidden;
+  max-height: 7rem;
+}
+.countdown-row.complete {
+  opacity: 0;
+  transform: translateY(-8px);
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin: 0;
+  border-width: 0;
+}
+.countdown-row-label{
+  font-size: clamp(0.6rem, 1.4vw, 0.7rem);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--text-muted);
+  margin-bottom: 0.55rem;
+  font-weight: 600;
+}
+.countdown-row-timer{
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+}
+.cr-num{
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  color: var(--white);
+  line-height: 1;
+  min-width: 1.8em;
+  text-align: right;
+  display: inline-block;
+}
+.cr-unit-letter{
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 0.35rem;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+}
+.cr-sep{
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  color: var(--purple);
+  align-self: baseline;
+  padding: 0 0.15rem;
+}
+
+/* Legacy single-countdown fallback for reveal/live phase */
+.countdown-section{margin-bottom:2.5rem;opacity:0;animation:fadeUp 0.8s 0.9s cubic-bezier(0.16,1,0.3,1) forwards}
+.countdown-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--text-muted);margin-bottom:0.75rem;font-weight:600}
+.countdown{display:flex;align-items:center;justify-content:center;gap:0.5rem}
+.cd-unit{display:flex;flex-direction:column;align-items:center;gap:0.25rem}
+.cd-digits{
+  font-size:clamp(1.5rem,5vw,2.5rem);font-weight:900;font-variant-numeric:tabular-nums;
+  background:var(--surface-raised);padding:0.3em 0.5em;border-radius:0.75rem;
+  border:1px solid var(--border);min-width:2.5em;
+  transition:transform 0.15s ease;
+}
+.cd-digits.flip{animation:flipIn 0.3s ease}
+@keyframes flipIn{0%{transform:scaleY(0.8);opacity:0.5}100%{transform:scaleY(1);opacity:1}}
+.cd-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted)}
+.cd-sep{font-size:clamp(1.2rem,4vw,2rem);color:var(--text-muted);font-weight:700;padding:0 0.1em}
+
+.social{margin-top:auto;padding-top:2rem;opacity:0;animation:fadeUp 0.8s 1.2s cubic-bezier(0.16,1,0.3,1) forwards}
+.x-link{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.6rem 1.25rem;border-radius:9999px;
+  border:1px solid var(--border);background:var(--surface-raised);
+  color:var(--text-secondary);font-size:0.8rem;font-weight:500;text-decoration:none;
+  transition:all 0.2s ease;
+}
+.x-link:hover{border-color:var(--purple);color:white;background:rgba(108,92,231,0.1)}
+.x-link svg{width:14px;height:14px;fill:currentColor}
+
+.footer{
+  padding:2rem 1rem;text-align:center;max-width:880px;margin:0 auto;
+  opacity:0;animation:fadeUp 0.8s 1.3s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.footer p{font-size:0.72rem;color:var(--text-muted);line-height:1.55}
+.footer p + p{margin-top:0.4rem;font-size:0.68rem}
+.footer-links{margin-top:1.25rem;text-align:center;font-size:0.78rem;letter-spacing:0.05em}
+.footer-url{color:var(--text-secondary);text-decoration:none}
+.footer-url:hover{color:var(--gold);text-decoration:underline}
+.footer-divider{display:inline-block;margin:0 0.6em;color:var(--border)}
+
+.hidden{display:none !important}
+
+@media(max-width:480px){
+  .page{padding:1.5rem 1rem}
+  .hero-wrap{margin-bottom:1.5rem}
+  .vote-card{padding:1.5rem 1rem}
+  .vote-stats{gap:1.25rem}
+  .hook-banner{padding:1rem 0.5rem;margin-bottom:1.75rem}
+  .hook-line-1,.hook-line-2{letter-spacing:0.06em;font-size:1.05rem}
+}
+@media(min-width:768px){
+  .page{padding:3rem 2rem}
+}
+
+@supports(min-height:100dvh){
+  .page{min-height:100dvh}
+}
+
+.curve-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.curve-bg svg{width:90vw;max-width:1400px;height:70vh;max-height:700px;opacity:0.18}
+#curvePath{
+  fill:none;stroke:url(#curveGradient);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 0 12px rgba(108,92,231,0.6));opacity:0;
+}
+.curve-label{display:none !important}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important}
+  #curvePath{opacity:0.5 !important;stroke-dashoffset:0 !important;transition:none !important}
+}
+
+.ticker-bar{
+  width:100%;max-width:1200px;margin:0 auto 0.75rem;
+  overflow:hidden;position:relative;
+  border:1px solid rgba(108,92,231,0.25);border-radius:9999px;
+  background:linear-gradient(90deg,rgba(108,92,231,0.05),rgba(255,215,0,0.03),rgba(108,92,231,0.05));
+  padding:0.35rem 0;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%);
+  opacity:0;animation:fadeUp 0.6s 0.9s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.ticker-bar.hidden{display:none}
+.ticker-label{
+  position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);z-index:2;
+  font-size:0.55rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--gold);padding:0.18rem 0.55rem;border-radius:9999px;
+  background:var(--bg);border:1px solid rgba(255,215,0,0.3);
+  display:inline-flex;align-items:center;gap:0.35rem;
+}
+.ticker-label::before{
+  content:'';width:5px;height:5px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 6px rgba(16,185,129,0.7);animation:livePulse 2s ease infinite;
+}
+.ticker-track{
+  display:flex;gap:2rem;align-items:center;
+  padding-left:5.5rem;
+  animation:tickerScroll 40s linear infinite;
+  width:max-content;
+  will-change:transform;
+}
+.ticker-bar:hover .ticker-track,
+.ticker-bar:focus-within .ticker-track{animation-play-state:paused}
+.ticker-item{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  font-size:0.7rem;font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.ticker-item .sym{color:var(--white);font-weight:700;letter-spacing:0.02em}
+.ticker-item .name{color:var(--text-muted);font-size:0.6rem}
+.ticker-item .change{
+  font-weight:800;padding:0.1rem 0.45rem;border-radius:9999px;
+  font-size:0.65rem;letter-spacing:0.02em;
+}
+.ticker-item .change.up{color:var(--green);background:rgba(16,185,129,0.12)}
+.ticker-item .change.down{color:#EF4444;background:rgba(239,68,68,0.12)}
+.ticker-item .to-rank{color:var(--text-muted);font-size:0.6rem}
+.ticker-sep{color:var(--text-muted);opacity:0.4;font-size:0.8rem}
+@keyframes tickerScroll{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+@media(prefers-reduced-motion:reduce){
+  .ticker-track{animation:none;padding-left:5.5rem;padding-right:1rem;flex-wrap:wrap}
+  .ticker-bar{-webkit-mask-image:none;mask-image:none}
+}
+@media(max-width:480px){
+  .ticker-label{font-size:0.5rem;padding:0.15rem 0.45rem;left:0.5rem}
+  .ticker-track{padding-left:4.5rem;gap:1.25rem;animation-duration:30s}
+  .ticker-item{font-size:0.65rem}
+  .ticker-item .name{display:none}
+}
+
+.token-browser{
+  width:100%;max-width:1200px;margin:0 auto 2.5rem;
+  opacity:0;animation:fadeUp 0.8s 1s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.token-browser-title{
+  font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:0.75rem;text-align:center;
+  letter-spacing:0.05em;
+}
+.token-browser-sub{
+  font-size:0.8rem;color:var(--text-muted);margin-bottom:1.25rem;text-align:center;
+}
+.filter-bar{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:0.35rem;margin-bottom:1.25rem;
+  padding:0 0.5rem;
+}
+.filter-btn{
+  padding:0.35rem 0.75rem;border-radius:9999px;font-size:0.65rem;font-weight:600;
+  letter-spacing:0.05em;text-transform:uppercase;border:1px solid var(--border);
+  background:var(--surface);color:var(--text-muted);cursor:pointer;
+  transition:all 0.15s ease;white-space:nowrap;
+  font-family:inherit;
+}
+.filter-btn:hover{border-color:var(--purple);color:var(--white)}
+.filter-btn.active{
+  background:var(--purple);border-color:var(--purple);color:var(--white);
+  box-shadow:0 0 12px rgba(108,92,231,0.3);
+}
+.filter-count{
+  font-size:0.55rem;opacity:0.6;margin-left:0.25rem;font-weight:400;
+}
+.token-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:0.5rem;
+  padding:0 0.25rem;
+}
+@media(min-width:768px){
+  .token-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.6rem}
+}
+@media(min-width:1024px){
+  .token-grid{grid-template-columns:repeat(6,1fr);gap:0.65rem}
+}
+.token-card{
+  display:flex;flex-direction:column;align-items:center;gap:0.3rem;
+  padding:0.65rem 0.4rem;border-radius:0.75rem;
+  border:1px solid var(--border);background:var(--surface-raised);
+  transition:all 0.25s ease;cursor:default;position:relative;overflow:hidden;
+}
+.token-card:hover{
+  border-color:var(--purple);transform:translateY(-1px);
+  box-shadow:0 4px 16px rgba(108,92,231,0.15);
+}
+.token-card.in-64{
+  border-color:rgba(255,215,0,0.5);
+  box-shadow:0 0 0 1px rgba(255,215,0,0.25),0 0 18px rgba(255,215,0,0.10);
+  background:linear-gradient(180deg,rgba(255,215,0,0.05),var(--surface-raised) 65%);
+}
+.token-card.in-64:hover{
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold),0 4px 22px rgba(255,215,0,0.25);
+}
+.token-card .rank{
+  position:absolute;top:0.25rem;left:0.35rem;font-size:0.55rem;
+  color:var(--text-muted);font-weight:600;opacity:0.5;
+  font-variant-numeric:tabular-nums;
+}
+.token-card.in-64 .rank{color:var(--gold);opacity:1;font-weight:800}
+.token-card .delta{
+  position:absolute;top:0.25rem;right:0.35rem;font-size:0.55rem;font-weight:800;
+  padding:0.05rem 0.35rem;border-radius:9999px;letter-spacing:0.02em;
+  font-variant-numeric:tabular-nums;animation:deltaPulse 1.6s ease;
+}
+.token-card .delta.up{color:var(--green);background:rgba(16,185,129,0.14)}
+.token-card .delta.down{color:#EF4444;background:rgba(239,68,68,0.14)}
+@keyframes deltaPulse{
+  0%{transform:scale(0.6);opacity:0}
+  35%{transform:scale(1.18);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+.token-logo{
+  width:36px;height:36px;border-radius:50%;object-fit:cover;
+  background:var(--surface);border:1px solid var(--border);
+}
+.token-sym{font-size:0.75rem;font-weight:700;color:var(--white);letter-spacing:0.03em}
+.token-name{font-size:0.55rem;color:var(--text-muted);text-align:center;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.token-mcap{font-size:0.55rem;color:var(--text-secondary);font-weight:500;font-variant-numeric:tabular-nums}
+.token-weight{
+  font-size:0.6rem;color:var(--gold);font-weight:700;letter-spacing:0.02em;
+  font-variant-numeric:tabular-nums;line-height:1;
+}
+.token-overall{
+  font-size:0.48rem;color:var(--text-muted);letter-spacing:0.05em;
+  text-transform:uppercase;opacity:0.75;font-variant-numeric:tabular-nums;
+}
+.token-cat{
+  font-size:0.45rem;padding:0.15rem 0.4rem;border-radius:9999px;
+  background:rgba(108,92,231,0.1);color:var(--purple);font-weight:600;
+  letter-spacing:0.05em;text-transform:uppercase;
+}
+/* Collapsed grid shows first 12 cards (mobile) / 24 (desktop) until toggle expands. */
+@media(max-width:767px){
+  .token-grid.collapsed > .token-card:nth-child(n+13){display:none}
+}
+@media(min-width:768px){
+  .token-grid.collapsed > .token-card:nth-child(n+25){display:none}
+}
+.token-grid-toggle-wrap{
+  display:flex;justify-content:center;margin:1.25rem auto 0;padding:0 0.5rem;
+}
+.token-grid-toggle-wrap[hidden]{display:none}
+.token-grid-toggle{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.55rem 1.4rem;border-radius:9999px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--text-secondary);font-family:inherit;
+  font-size:0.65rem;font-weight:600;letter-spacing:0.1em;
+  text-transform:uppercase;cursor:pointer;
+  transition:all 0.2s ease;
+}
+.token-grid-toggle:hover{border-color:var(--gold);color:var(--gold)}
+.token-grid-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.token-grid-toggle-icon{display:inline-block;font-size:0.55rem;transition:transform 0.3s ease}
+.live-dot{
+  display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);
+  margin-right:0.45rem;vertical-align:middle;animation:livePulse 2s ease infinite;
+  box-shadow:0 0 8px rgba(16,185,129,0.6);
+}
+.live-final-badge{
+  color:var(--gold);font-weight:800;letter-spacing:0.08em;
+  padding:0.05rem 0.4rem;border-radius:9999px;
+  background:rgba(255,215,0,0.1);margin-right:0.4rem;
+}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.45}}
+@media(prefers-reduced-motion:reduce){
+  .token-card .delta{animation:none}
+  .live-dot{animation:none}
+}
+/* Reveal-phase: The Final 64 roster box */
+.final-roster{
+  margin-top:1rem;border-radius:1.25rem;overflow:hidden;
+  border:1px solid rgba(255,215,0,0.5);
+  background:linear-gradient(180deg,rgba(255,215,0,0.06),var(--surface-raised) 70%);
+  box-shadow:0 0 0 1px rgba(255,215,0,0.18),0 0 30px rgba(255,215,0,0.10);
+}
+.final-roster-header{
+  display:flex;align-items:center;justify-content:space-between;gap:0.75rem;
+  width:100%;padding:1rem 1.25rem;background:transparent;border:none;
+  cursor:pointer;font-family:inherit;text-align:left;
+}
+.final-roster-header:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.final-roster-title{font-size:0.95rem;font-weight:800;color:var(--gold);letter-spacing:0.04em;text-transform:uppercase}
+.final-roster-sub{color:var(--text-secondary);font-weight:500;font-size:0.78rem;letter-spacing:0;text-transform:none}
+.final-roster-chevron{color:var(--gold);font-size:0.75rem;transition:transform 0.3s ease;flex-shrink:0}
+.final-roster.collapsed .final-roster-chevron{transform:rotate(-90deg)}
+.final-roster.collapsed .final-roster-body{display:none}
+.final-roster-body{max-height:22rem;overflow-y:auto;padding:0 0.6rem 0.6rem}
+.final-roster-list{list-style:none;margin:0;padding:0}
+.fr-row{
+  display:flex;align-items:center;gap:0.6rem;
+  padding:0.5rem 0.55rem;border-bottom:1px solid var(--border);
+}
+.fr-row:last-child{border-bottom:none}
+.fr-rank{
+  font-size:0.72rem;font-weight:800;color:var(--gold);
+  font-variant-numeric:tabular-nums;min-width:2.3rem;flex-shrink:0;
+}
+.fr-logo{
+  width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;
+  background:var(--surface);border:1px solid var(--border);
+}
+.fr-sym{font-size:0.75rem;font-weight:700;color:var(--white);letter-spacing:0.03em;min-width:4.5rem;flex-shrink:0}
+.fr-name{font-size:0.66rem;color:var(--text-secondary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fr-votes{font-size:0.66rem;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
+
+/* Category colors */
+.cat-Native{background:rgba(255,215,0,0.1);color:var(--gold)}
+.cat-L2{background:rgba(9,132,227,0.1);color:var(--purple-secondary)}
+.cat-DeFi{background:rgba(108,92,231,0.1);color:var(--purple)}
+.cat-Stable{background:rgba(16,185,129,0.1);color:var(--green)}
+.cat-Gold{background:rgba(255,215,0,0.15);color:#DAA520}
+.cat-Yield{background:rgba(16,185,129,0.1);color:var(--green)}
+.cat-Gaming{background:rgba(239,68,68,0.1);color:#EF4444}
+.cat-Meme{background:rgba(255,165,0,0.1);color:#FFA500}
+.cat-Infra{background:rgba(100,149,237,0.1);color:#6495ED}
+.cat-Utility{background:rgba(147,112,219,0.1);color:#9370DB}
+.cat-Exchange{background:rgba(255,215,0,0.1);color:var(--gold-dim)}
+.cat-Wrapped{background:rgba(192,192,192,0.1);color:#C0C0C0}
+.cat-AI{background:rgba(0,255,127,0.1);color:#00FF7F}
+.token-search{
+  width:100%;max-width:320px;margin:0 auto 1rem;display:block;
+  padding:0.5rem 1rem;border-radius:9999px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--white);font-size:0.8rem;font-family:inherit;
+  transition:border-color 0.2s ease;
+}
+.token-search:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(108,92,231,0.15)}
+.token-search::placeholder{color:var(--text-muted)}
+.no-results{
+  text-align:center;padding:2rem;color:var(--text-muted);font-size:0.85rem;
+  grid-column:1/-1;
+}
+@media(max-width:480px){
+  .token-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:0.4rem}
+  .token-card{padding:0.5rem 0.3rem}
+  .token-logo{width:30px;height:30px}
+  .token-sym{font-size:0.7rem}
+  .token-cat{font-size:0.5rem;padding:0.2rem 0.45rem}
+  .filter-bar{gap:0.3rem}
+  .filter-btn{padding:0.5rem 0.8rem;font-size:0.6rem;min-height:34px}
+  .filter-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+}
+.filter-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* Candidate marquee — infinite-scroll strip of all 300 candidates */
+.chain-marquee{
+  width:100%;
+  max-width:900px;
+  overflow:hidden;
+  padding:1rem 0;
+  margin:0 auto 2rem;
+  position:relative;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 12%,#000 88%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0%,#000 12%,#000 88%,transparent 100%);
+}
+.chain-marquee-track{
+  display:flex;
+  gap:2.25rem;
+  width:max-content;
+  animation:candMarqueeScroll 300s linear infinite;
+  align-items:center;
+}
+.chain-marquee:hover .chain-marquee-track,
+.chain-marquee:focus-within .chain-marquee-track{animation-play-state:paused}
+.chain-marquee-track img{
+  height:44px;width:44px;
+  flex-shrink:0;
+  object-fit:contain;
+  filter:grayscale(0.4) brightness(1.15);
+  opacity:0.78;
+  transition:all 0.3s ease;
+}
+.chain-marquee-track img:hover{filter:grayscale(0) brightness(1.3);opacity:1;transform:scale(1.15)}
+@keyframes candMarqueeScroll{
+  from{transform:translateX(0)}
+  to  {transform:translateX(-50%)}
+}
+@media (max-width:480px){
+  .chain-marquee-track img{height:36px;width:36px}
+  .chain-marquee-track{gap:1.75rem}
+  .chain-marquee{padding:0.75rem 0;margin-bottom:1.5rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .chain-marquee-track{animation:none;flex-wrap:nowrap;overflow-x:auto;max-width:100vw;-webkit-overflow-scrolling:touch}
+}
+.chain-marquee:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+/* Phase timeline — 4-phase progress indicator */
+.pz-timeline{width:100%;max-width:540px;margin:1.75rem auto 0;padding:0 0.5rem;opacity:0;transform:translateY(12px);animation:pzTimelineIn 0.9s 1.4s cubic-bezier(0.16,1,0.3,1) forwards}
+@keyframes pzTimelineIn{to{opacity:1;transform:translateY(0)}}
+.pz-timeline-track{display:flex;align-items:flex-start;justify-content:space-between;list-style:none;padding:0;margin:0;position:relative}
+.pz-timeline-node{display:flex;flex-direction:column;align-items:center;gap:0.55rem;position:relative;flex:1 1 0;min-width:0;z-index:1}
+.pz-timeline-node:not(:last-child)::after{content:'';position:absolute;top:0.29rem;left:50%;width:100%;height:2px;background:#4A4A5A;z-index:0;transition:background 0.6s ease}
+.pz-timeline-dot{width:0.68rem;height:0.68rem;border-radius:50%;border:1.5px solid var(--text-muted,#6B7280);background:transparent;position:relative;z-index:1;transition:background 0.5s cubic-bezier(0.16,1,0.3,1),border-color 0.5s cubic-bezier(0.16,1,0.3,1),box-shadow 0.5s ease}
+.pz-timeline-label{font-size:clamp(0.55rem,1.4vw,0.66rem);text-transform:uppercase;letter-spacing:0.22em;color:var(--text-muted,#6B7280);font-weight:600;text-align:center;line-height:1;white-space:nowrap;transition:color 0.5s ease,text-shadow 0.5s ease}
+.pz-timeline[data-active="vote"]    .pz-timeline-node[data-phase="announce"] .pz-timeline-dot,
+.pz-timeline[data-active="results"] .pz-timeline-node[data-phase="announce"] .pz-timeline-dot,
+.pz-timeline[data-active="results"] .pz-timeline-node[data-phase="vote"]     .pz-timeline-dot,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="announce"] .pz-timeline-dot,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="vote"]     .pz-timeline-dot,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="results"]  .pz-timeline-dot{background:var(--gold-dim,#B8960C);border-color:var(--gold-dim,#B8960C)}
+.pz-timeline[data-active="vote"]    .pz-timeline-node[data-phase="announce"] .pz-timeline-label,
+.pz-timeline[data-active="results"] .pz-timeline-node[data-phase="announce"] .pz-timeline-label,
+.pz-timeline[data-active="results"] .pz-timeline-node[data-phase="vote"]     .pz-timeline-label,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="announce"] .pz-timeline-label,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="vote"]     .pz-timeline-label,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="results"]  .pz-timeline-label{color:var(--gold-dim,#B8960C)}
+.pz-timeline[data-active="vote"]    .pz-timeline-node[data-phase="announce"]::after,
+.pz-timeline[data-active="results"] .pz-timeline-node[data-phase="announce"]::after,
+.pz-timeline[data-active="results"] .pz-timeline-node[data-phase="vote"]::after,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="announce"]::after,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="vote"]::after,
+.pz-timeline[data-active="deploy"]  .pz-timeline-node[data-phase="results"]::after{background:var(--gold-dim,#B8960C)}
+.pz-timeline[data-active="announce"] .pz-timeline-node[data-phase="announce"] .pz-timeline-dot,
+.pz-timeline[data-active="vote"]     .pz-timeline-node[data-phase="vote"]     .pz-timeline-dot,
+.pz-timeline[data-active="results"]  .pz-timeline-node[data-phase="results"]  .pz-timeline-dot,
+.pz-timeline[data-active="deploy"]   .pz-timeline-node[data-phase="deploy"]   .pz-timeline-dot{background:var(--gold,#FFD700);border-color:var(--gold,#FFD700);box-shadow:0 0 0 4px rgba(255,215,0,0.14),0 0 14px var(--gold-glow,rgba(255,215,0,0.35));animation:pzTimelineDotPulse 2.2s ease-in-out infinite}
+.pz-timeline[data-active="announce"] .pz-timeline-node[data-phase="announce"] .pz-timeline-label,
+.pz-timeline[data-active="vote"]     .pz-timeline-node[data-phase="vote"]     .pz-timeline-label,
+.pz-timeline[data-active="results"]  .pz-timeline-node[data-phase="results"]  .pz-timeline-label,
+.pz-timeline[data-active="deploy"]   .pz-timeline-node[data-phase="deploy"]   .pz-timeline-label{color:var(--gold,#FFD700);text-shadow:0 0 12px rgba(255,215,0,0.35)}
+@keyframes pzTimelineDotPulse{0%,100%{box-shadow:0 0 0 4px rgba(255,215,0,0.12),0 0 12px var(--gold-glow,rgba(255,215,0,0.3))}50%{box-shadow:0 0 0 6px rgba(255,215,0,0.06),0 0 22px var(--gold-glow,rgba(255,215,0,0.45))}}
+@media (prefers-reduced-motion:reduce){.pz-timeline{animation:none;opacity:1;transform:none}.pz-timeline-dot{animation:none !important}}
+</style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true"></div>
+
+<div class="curve-bg" aria-hidden="true">
+  <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#6C5CE7"/>
+        <stop offset="50%" stop-color="#FFD700"/>
+        <stop offset="100%" stop-color="#6C5CE7"/>
+      </linearGradient>
+    </defs>
+    <path id="curvePath" d="M0,380 L800,20"/>
+  </svg>
+  <div class="curve-label" id="curveLabel">LINEAR</div>
+</div>
+
+<main class="page">
+
+  <div class="hero-wrap">
+    <div class="hero-frame">
+      <img id="heroImg" src="raccoon/punzi-war-is-coming.jpg" alt="PUNZI mascot" width="1536" height="1024" loading="eager">
+      <div style="display:none;align-items:center;justify-content:center;width:100%;height:100%;background:var(--surface)" aria-hidden="true">
+        <svg width="120" height="120" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="80" cy="95" rx="40" ry="50" fill="#1E1E2E"/><ellipse cx="80" cy="60" rx="30" ry="28" fill="#2A2A3E"/>
+          <ellipse cx="60" cy="48" rx="12" ry="16" fill="#1E1E2E" transform="rotate(-15 60 48)"/>
+          <ellipse cx="100" cy="48" rx="12" ry="16" fill="#1E1E2E" transform="rotate(15 100 48)"/>
+          <circle cx="70" cy="58" r="5" fill="#6C5CE7"/><circle cx="90" cy="58" r="5" fill="#6C5CE7"/>
+          <ellipse cx="80" cy="68" rx="4" ry="3" fill="#FFD700"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="title-block">
+    <h1 class="title-main">PUNZI WARS</h1>
+    <p class="title-sub" id="titleSub">The Game Begins Soon</p>
+  </div>
+
+  <div class="tagline">
+    <p class="stat-line">
+      <span class="num">300</span> Candidates &middot;
+      <span class="chain">64</span> Slots &middot;
+      <span class="num">Your</span> Vote Decides
+    </p>
+  </div>
+
+  <div class="chain-marquee" aria-label="300 vote candidates" tabindex="0">
+    <div class="chain-marquee-track" id="chainMarqueeTrack">
+    </div>
+  </div>
+
+  <div class="phase-indicator" id="phaseIndicator">
+    <div class="phase-dot voting" id="phaseDot"></div>
+    <span class="phase-text" id="phaseText">Voting Open</span>
+  </div>
+
+  <!-- Empty shell kept so phase-state JS toggling .hidden doesn't crash. -->
+  <div class="teaser hidden" id="introSection" style="display:none" aria-hidden="true"></div>
+
+  <div class="vote-section" id="voteSection">
+    <div class="vote-card">
+      <div class="vote-title">The PUNZI Wars Token Election</div>
+      <p class="vote-desc">
+        300 candidates. 64 slots. Pick up to 64 tokens you want in the game &mdash; the
+        64 chosen by the most voters become the launch roster. No wallet, no account,
+        no login. Select from the 300 below, then submit your ballot.
+      </p>
+      <div class="vote-stats">
+        <div class="vote-stat">
+          <div class="vote-stat-num" id="voterCount">0</div>
+          <div class="vote-stat-label">Total Votes</div>
+        </div>
+        <div class="vote-stat">
+          <div class="vote-stat-num" id="daysLeft">&mdash;</div>
+          <div class="vote-stat-label">Days Remaining</div>
+        </div>
+        <div class="vote-stat">
+          <div class="vote-stat-num">300</div>
+          <div class="vote-stat-label">Candidates</div>
+        </div>
+      </div>
+      <p class="vote-stats-note">Total Votes is the live tally &mdash; it updates about every 90 seconds.</p>
+      <div class="ballot-submit" id="ballotSubmit">
+        <div class="ballot-count" id="selectionCount">0 of 64 selected</div>
+        <div class="cf-turnstile" id="turnstileWidget"
+             data-sitekey="0x4AAAAAADSG02IRUItkgZcA"
+             data-callback="punziTurnstileOk"
+             data-error-callback="punziTurnstileErr"
+             data-expired-callback="punziTurnstileExpired"></div>
+        <button type="button" class="vote-btn" id="submitBallotBtn" disabled>Submit Ballot</button>
+        <p class="ballot-status" id="submitStatus" role="status" aria-live="polite"></p>
+        <p class="ballot-hint">Tap tokens from the 300 below to select.</p>
+      </div>
+      <div class="vote-round-info">
+        The 64 most-picked tokens make the final roster. An open poll.
+      </div>
+
+      <div class="share-card">
+        <p class="share-prompt">Already voted? Help spread the word.</p>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="share-btn share-btn-x" id="sharePostBtn">Post on X</a>
+      </div>
+    </div>
+    <script src="prepop-days.js"></script>
+  </div>
+
+  <!-- Reveal section: voting closed, before the reveal pin loads. -->
+  <div class="vote-section hidden" id="revealSection">
+    <div class="vote-card" style="border-color:var(--gold)">
+      <div class="vote-title" style="color:var(--gold)">Voting Has Ended</div>
+      <p class="vote-desc">
+        Voting closed 2026-07-06 03:00 UTC. The community has chosen its 64 &mdash;
+        the winning roster is final and listed below.
+      </p>
+      <div class="vote-stats">
+        <div class="vote-stat">
+          <div class="vote-stat-num" id="totalVoters">&mdash;</div>
+          <div class="vote-stat-label">Total Votes</div>
+        </div>
+        <div class="vote-stat">
+          <div class="vote-stat-num">300</div>
+          <div class="vote-stat-label">Candidates</div>
+        </div>
+      </div>
+    </div>
+    <div class="final-roster" id="finalRoster">
+      <button type="button" class="final-roster-header" id="finalRosterToggle" aria-expanded="true" aria-controls="finalRosterBody">
+        <span class="final-roster-title">The Final 64<span class="final-roster-sub"> &mdash; chosen by the community</span></span>
+        <span class="final-roster-chevron" aria-hidden="true">&#x25BE;</span>
+      </button>
+      <div class="final-roster-body" id="finalRosterBody">
+        <ol class="final-roster-list" id="finalRosterList"></ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="vote-section hidden" id="liveSection">
+    <div class="vote-card" style="border-color:var(--green)">
+      <div class="vote-title" style="color:var(--green)">The PUNZI Wars Are Live</div>
+      <p class="vote-desc">
+        64 tokens. 17 chains. 7 crowns. The contracts are deployed, seeded, and renounced.
+        The math is running. The wars have begun.
+      </p>
+      <div class="live-actions">
+        <a href="https://punzi.xyz" class="vote-btn" style="background:var(--green)" id="dappLink">
+          Enter the Game
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <a href="https://punzi.xyz/warroom" class="vote-btn vote-btn-ghost" id="rankingsLink">
+          View Live Rankings
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/>
+            <path d="M7 14l4-4 4 4 5-5"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hook-banner">
+    <p class="hook-line-1">THE PUNZI WARS ARE COMING.</p>
+    <p class="hook-line-2" id="hookLine2">WILL YOU DECIDE?</p>
+  </div>
+
+  <div class="ticker-bar hidden" id="tickerBar" aria-label="Recent rank changes" role="status">
+    <span class="ticker-label" aria-hidden="true">Live</span>
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <div class="token-browser" id="tokenBrowser">
+    <div class="token-browser-title">300 Candidates</div>
+    <div class="token-browser-sub" id="tokenBrowserSub">Sorted by market cap. The community votes to select 64.</div>
+    <input type="text" class="token-search" id="tokenSearch" placeholder="Search tokens..." aria-label="Search tokens">
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="token-grid collapsed" id="tokenGrid"></div>
+    <div class="token-grid-toggle-wrap" id="tokenGridToggleWrap" hidden>
+      <button type="button" class="token-grid-toggle" id="tokenGridToggle" aria-expanded="false" aria-controls="tokenGrid">
+        <span class="token-grid-toggle-text">Show all 300 candidates</span>
+        <span class="token-grid-toggle-icon" aria-hidden="true">&#x25BC;</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="countdown-stack" id="countdownStack">
+    <div class="countdown-row" id="cdRowClose" role="timer" aria-live="polite" aria-atomic="true">
+      <p class="countdown-row-label" id="cdRowLabel">Voting Closes In</p>
+      <div class="countdown-row-timer">
+        <span class="cr-num" id="cd-close-d" aria-label="days">--</span><span class="cr-unit-letter">d</span>
+        <span class="cr-sep" aria-hidden="true">:</span>
+        <span class="cr-num" id="cd-close-h" aria-label="hours">--</span><span class="cr-unit-letter">h</span>
+        <span class="cr-sep" aria-hidden="true">:</span>
+        <span class="cr-num" id="cd-close-m" aria-label="minutes">--</span><span class="cr-unit-letter">m</span>
+        <span class="cr-sep" aria-hidden="true">:</span>
+        <span class="cr-num" id="cd-close-s" aria-label="seconds">--</span><span class="cr-unit-letter">s</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="pz-timeline" id="pzTimeline" data-active="vote" aria-label="PUNZI Wars campaign timeline">
+    <ol class="pz-timeline-track">
+      <li class="pz-timeline-node" data-phase="announce">
+        <span class="pz-timeline-dot" aria-hidden="true"></span>
+        <span class="pz-timeline-label">announce</span>
+      </li>
+      <li class="pz-timeline-node" data-phase="vote" aria-current="step">
+        <span class="pz-timeline-dot" aria-hidden="true"></span>
+        <span class="pz-timeline-label">vote</span>
+      </li>
+      <li class="pz-timeline-node" data-phase="results">
+        <span class="pz-timeline-dot" aria-hidden="true"></span>
+        <span class="pz-timeline-label">results</span>
+      </li>
+      <li class="pz-timeline-node" data-phase="deploy">
+        <span class="pz-timeline-dot" aria-hidden="true"></span>
+        <span class="pz-timeline-label">deploy</span>
+      </li>
+    </ol>
+  </nav>
+
+  <div class="social">
+    <a href="https://x.com/PUNZIwars" target="_blank" rel="noopener noreferrer" class="x-link" aria-label="Follow PUNZI on X">
+      <svg aria-hidden="true" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+      Follow on X
+    </a>
+  </div>
+
+  <footer class="footer">
+    <p>PUNZI is a transparent mathematical game and on-chain experiment. It is not an investment. Smart contracts are immutable and carry inherent risk. Do not play with funds you cannot afford to lose. Participation is at your own risk.</p>
+    <p>By using this site you agree to the Terms &amp; Conditions and acknowledge all Disclaimers.</p>
+    <div class="footer-links">
+      <a href="https://punzi.xyz" class="footer-url" rel="noopener">punzi.xyz</a>
+      <span class="footer-divider" aria-hidden="true">·</span>
+      <a href="https://punziwars.com" class="footer-url" rel="noopener">punziwars.com</a>
+      <span class="footer-divider" aria-hidden="true">·</span>
+      <a href="https://punzi.eth/" class="footer-url" rel="noopener">punzi.eth</a>
+    </div>
+  </footer>
+
+</main>
+
+<script src="vote-main.js"></script>
+<script src="hero-fallback.js"></script>
+
+</body>
+</html>

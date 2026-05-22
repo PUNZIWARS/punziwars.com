@@ -1,0 +1,15 @@
+# Cloudflare Worker config for punzi.xyz.
+# Deploy: from this directory, run `wrangler deploy`.
+# Custom domain binding (punzi.xyz) is configured via the Cloudflare dashboard
+# AFTER nameserver migration completes. Do not uncomment routes until the zone
+# is fully active at Cloudflare.
+
+name = "punzi-xyz"
+main = "index.js"
+compatibility_date = "2026-04-30"
+
+# Uncomment after NS migration completes and zone is active at Cloudflare:
+# routes = [
+#   { pattern = "punzi.xyz/*", zone_name = "punzi.xyz" },
+#   { pattern = "punzi.xyz",   zone_name = "punzi.xyz" }
+# ]

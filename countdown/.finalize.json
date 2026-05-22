@@ -1,0 +1,7 @@
+{
+  "pin": "countdown-vote",
+  "finalized_at": "2026-05-21T22:13:41Z",
+  "bake_config_hash": "63d587b778f94cd19de3f814958b33b6dec26206095d6a7d930dc7500ebd7243",
+  "collector_url": "https://punzi-vote-collector.punziwars.workers.dev",
+  "freeze_sha256": "249434b97420d2dd0207533fb692cd78a685d291ba51c0e4a85f8cf0dcc19c51"
+}
