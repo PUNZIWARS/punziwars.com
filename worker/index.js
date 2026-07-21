@@ -4,7 +4,7 @@
 // IPFS content identifier. Update this constant before every pin event and run
 // `wrangler deploy` from this directory; otherwise the apex will keep serving
 // the previous CID's content.
-const CID = "bafybeialdlixbhvlje4dcgdtunanfmpoz5x3bul6ywaulswggbqjdtycpq";
+const CID = "bafybeieavo66vq3ogp7e5qaghcrlh5fg3raatae5s7ehd5fp5yqtuwjuxy";
 
 const GATEWAYS = [
   (c) => `https://${c}.ipfs.dweb.link`,
