@@ -4,17 +4,18 @@
 // IPFS content identifier. Update this constant before every pin event and run
 // `wrangler deploy` from this directory; otherwise the apex will keep serving
 // the previous CID's content.
-const CID = "bafybeieavo66vq3ogp7e5qaghcrlh5fg3raatae5s7ehd5fp5yqtuwjuxy";
+const CID = "bafybeifx5qglymt2gwohwfnb6unym7wcqzk5rqqvdzcez4sucnxgiwahbi";
 
 const GATEWAYS = [
   (c) => `https://${c}.ipfs.dweb.link`,
   (c) => `https://${c}.ipfs.w3s.link`,
   (c) => `https://${c}.ipfs.nftstorage.link`,
   (c) => `https://ipfs.filebase.io/ipfs/${c}`,
+  (c) => `https://punziwars.4everland.link/ipfs/${c}`,
   (c) => `https://ipfs.io/ipfs/${c}`,
 ];
 
-// Per-gateway timeout. Promise.any() races all five in parallel; 12s leaves
+// Per-gateway timeout. Promise.any() races them all in parallel; 12s leaves
 // headroom for slow gateways (w3s.link, nftstorage.link) plus network jitter.
 const TIMEOUT_MS = 12000;
 
@@ -106,8 +107,21 @@ const PERMISSIONS_POLICY = [
   "xr-spatial-tracking=()",
 ].join(", ");
 
+// Cache lifetime by content type. Gateways send a long immutable lifetime for
+// IPFS content, but the paths on this domain change whenever the CID changes,
+// so pages must be re-checked often.
+function cacheControlFor(contentType) {
+  const ct = (contentType || "").toLowerCase();
+  if (ct.includes("text/html")) return "public, max-age=60, must-revalidate";
+  if (ct.includes("json") || ct.includes("text/plain"))
+    return "public, max-age=300, must-revalidate";
+  return "public, max-age=86400";
+}
+
 function withSecurityHeaders(upstream) {
   const headers = new Headers(upstream.headers);
+  headers.delete("expires");
+  headers.set("Cache-Control", cacheControlFor(headers.get("content-type")));
   headers.delete("Content-Security-Policy");
   headers.delete("content-security-policy");
   headers.delete("Content-Security-Policy-Report-Only");
@@ -139,7 +153,7 @@ export default {
     ).catch(() => null);
 
     if (!winner) {
-      // All five gateways failed. Return a minimal HTML page so visitors see a
+      // Every gateway failed. Return a minimal HTML page so visitors see a
       // human-readable message instead of a raw browser-default 503.
       const body =
         "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">" +
@@ -153,7 +167,7 @@ export default {
         "</main></body></html>";
       return new Response(body, {
         status: 503,
-        headers: { "content-type": "text/html; charset=utf-8" },
+        headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" },
       });
     }
 

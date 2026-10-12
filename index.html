@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<!-- PUNZI - (c) 2026 Charu Punjani. Code MIT; see LICENSE. -->
+<!-- PUNZI - (c) 2026 Charu Punjani. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<base href="/stage2-5/">
+<base href="/stage2-7/">
 <!-- Defense-in-depth CSP; primary enforcement at the gateway Worker layer. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>PUNZI WARS — Expected August–September 2026</title>
-<meta name="description" content="The community has chosen its 64. PUNZI WARS — a transparent mathematical game and on-chain experiment — is in final development. Expected release August–September 2026.">
+<title>PUNZI WARS — Coming Soon</title>
+<meta name="description" content="The 64 are chosen. PUNZI WARS — a transparent mathematical game and on-chain experiment — is in final development. Coming soon.">
 <meta name="theme-color" content="#0a0a0f">
 
 <!-- OG / Social -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="PUNZI WARS — Coming August–September 2026">
-<meta property="og:description" content="The community's 64 are chosen. Final development underway — expected release August–September 2026.">
+<meta property="og:title" content="PUNZI WARS — Coming Soon">
+<meta property="og:description" content="The 64 are chosen. Final development underway — coming soon.">
 <meta property="og:image" content="https://punzi.xyz/raccoon/punzi-the-weaver.jpg">
 <meta property="og:url" content="https://punzi.xyz">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PUNZI WARS — Coming August–September 2026">
-<meta name="twitter:description" content="The community's 64 are chosen. Final development underway — expected August–September 2026.">
+<meta name="twitter:title" content="PUNZI WARS — Coming Soon">
+<meta name="twitter:description" content="The 64 are chosen. Final development underway — coming soon.">
 <meta name="twitter:image" content="https://punzi.xyz/raccoon/punzi-the-weaver.jpg">
 
 <link rel="icon" href="icon.png" type="image/png">
@@ -39,7 +39,7 @@
   --gold-dim:#B8960C;
   --gold-glow:rgba(255,215,0,0.3);
   --border:#1E1E2E;
-  --text-muted:#6B7280;
+  --text-muted:#808792;
   --text-secondary:#9CA3AF;
   --white:#ffffff;
   --green:#10B981;
@@ -142,7 +142,29 @@ body{
   box-shadow:0 0 40px rgba(108,92,231,0.1);
 }
 .vote-title{font-size:1.25rem;font-weight:800;color:var(--white);margin-bottom:0.5rem}
-.vote-desc{font-size:0.9rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1.5rem}
+.vote-desc{font-size:0.9rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1.5rem;position:relative}
+.swap-trigger{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:1.05rem;height:1.05rem;margin-left:0.4rem;padding:0;border-radius:50%;
+  border:1px solid var(--text-muted);background:transparent;color:var(--text-muted);
+  font:inherit;font-size:0.62rem;font-weight:700;line-height:1;vertical-align:0.12em;
+  cursor:help;opacity:0.8;transition:color 0.15s ease,border-color 0.15s ease,opacity 0.15s ease;
+}
+.swap-trigger:hover,.swap-trigger[aria-expanded="true"]{color:var(--gold);border-color:var(--gold);opacity:1}
+.swap-trigger:focus-visible{outline:2px solid var(--gold);outline-offset:2px;opacity:1}
+.swap-popover{
+  display:none;position:absolute;left:0;right:0;top:calc(100% + 0.5rem);z-index:20;
+  padding:0.85rem 1rem;border-radius:0.75rem;text-align:left;
+  background:var(--surface-raised);border:1px solid var(--gold);
+  box-shadow:0 10px 30px rgba(0,0,0,0.55);
+  font-size:0.78rem;line-height:1.55;color:var(--text-secondary);
+}
+.swap-popover::before{content:"";position:absolute;left:0;right:0;top:-0.75rem;height:0.75rem}
+.swap-note:hover .swap-popover,.swap-trigger[aria-expanded="true"] + .swap-popover{display:block}
+.swap-line{display:block;margin-bottom:0.35rem}
+.swap-line strong{color:var(--white)}
+.swap-link{color:var(--gold);font-weight:700;text-decoration:none}
+.swap-link:hover,.swap-link:focus-visible{text-decoration:underline}
 .vote-stats{display:flex;justify-content:center;gap:2rem;margin-bottom:1.5rem;flex-wrap:wrap}
 .vote-stat{text-align:center}
 .vote-stat-num{font-size:1.5rem;font-weight:800;color:var(--gold)}
@@ -618,6 +640,7 @@ body{
 .final-roster.collapsed .final-roster-chevron{transform:rotate(-90deg)}
 .final-roster.collapsed .final-roster-body{display:none}
 .final-roster-body{max-height:22rem;overflow-y:auto;padding:0 0.6rem 0.6rem}
+.final-roster-body:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .final-roster-list{list-style:none;margin:0;padding:0}
 .fr-row{
   display:flex;align-items:center;gap:0.6rem;
@@ -704,12 +727,19 @@ body{
   transition:all 0.3s ease;
 }
 .chain-marquee-track img:hover{filter:grayscale(0) brightness(1.3);opacity:1;transform:scale(1.15)}
+.chain-marquee-fallback{
+  display:flex;align-items:center;justify-content:center;
+  height:44px;width:44px;flex-shrink:0;border-radius:50%;
+  background:var(--surface-raised);color:var(--text-secondary);
+  font-size:0.5rem;letter-spacing:-0.08em;line-height:1;
+}
 @keyframes candMarqueeScroll{
   from{transform:translateX(0)}
   to  {transform:translateX(-50%)}
 }
 @media (max-width:480px){
-  .chain-marquee-track img{height:36px;width:36px}
+  .chain-marquee-track img,.chain-marquee-fallback{height:36px;width:36px}
+  .chain-marquee-fallback{font-size:0.42rem}
   .chain-marquee-track{gap:1.75rem}
   .chain-marquee{padding:0.75rem 0;margin-bottom:1.5rem}
 }
@@ -758,7 +788,6 @@ body{
 <style>
 /* Interim holding-page: expected-release block */
 .release-block{max-width:520px;margin:2.75rem auto 0;text-align:center;padding:1.9rem 1.5rem;border:1px solid rgba(255,215,0,0.28);border-radius:1.25rem;background:linear-gradient(180deg,rgba(255,215,0,0.05),var(--surface-raised) 75%);box-shadow:0 0 0 1px rgba(255,215,0,0.10),0 0 34px rgba(255,215,0,0.07)}
-.release-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.24em;color:var(--text-muted);font-weight:600;margin-bottom:0.65rem}
 .release-window{font-size:2rem;font-weight:800;color:var(--gold);letter-spacing:-0.01em;line-height:1.1;text-shadow:0 0 20px var(--gold-glow)}
 .release-updates{display:inline-flex;align-items:center;gap:0.45rem;margin-top:1.25rem;padding:0.62rem 1.15rem;border:1px solid var(--purple);border-radius:0.65rem;color:var(--white);font-size:0.9rem;font-weight:600;text-decoration:none;transition:background 0.15s ease,border-color 0.15s ease}
 .release-updates:hover{background:var(--purple-glow);border-color:var(--purple-secondary)}
@@ -815,7 +844,7 @@ body{
     </p>
   </div>
 
-  <div class="chain-marquee" aria-label="300 vote candidates" tabindex="0">
+  <div class="chain-marquee" role="img" aria-label="300 vote candidates" tabindex="0">
     <div class="chain-marquee-track" id="chainMarqueeTrack">
     </div>
   </div>
@@ -827,13 +856,12 @@ body{
 
 
 
-  <!-- Results: the community's chosen 64 (static snapshot) -->
+  <!-- Results: the final 64 (static snapshot) -->
   <div class="vote-section" id="revealSection">
     <div class="vote-card" style="border-color:var(--gold)">
       <div class="vote-title" style="color:var(--gold)">Voting Has Ended</div>
       <p class="vote-desc">
-        Voting closed 2026-07-06 03:00 UTC. The community has chosen its 64 &mdash;
-        the roster is listed below.
+        5,576 votes received. The community has chosen. The final 64 are here.<span class="swap-note"><button type="button" class="swap-trigger" id="swapTrigger" aria-expanded="false" aria-controls="swapPopover" aria-label="About the four replaced tokens">?</button><span class="swap-popover" id="swapPopover" role="note"><span class="swap-line">Four of the community's 64 were replaced before launch.</span><span class="swap-line"><strong>Out:</strong> Moonbeam (GLMR), Moonriver (MOVR), Blast (BLAST), LayerZero (ZRO).</span><span class="swap-line"><strong>In:</strong> Plasma (XPL), Plume (PLUME), Ronin (RON), Convex Finance (CVX).</span><a class="swap-link" href="https://punziwars.substack.com/p/punzi-project-update-september-2026" target="_blank" rel="noopener noreferrer">Read why in the project update &rarr;</a></span></span>
       </p>
       <div class="vote-stats">
         <div class="vote-stat">
@@ -844,78 +872,82 @@ body{
           <div class="vote-stat-num">300</div>
           <div class="vote-stat-label">Candidates</div>
         </div>
+        <div class="vote-stat">
+          <div class="vote-stat-num">5,576</div>
+          <div class="vote-stat-label">Votes</div>
+        </div>
       </div>
     </div>
     <div class="final-roster" id="finalRoster">
       <div class="final-roster-header">
-        <span class="final-roster-title">The Final 64<span class="final-roster-sub"> &mdash; chosen by the community</span></span>
+        <span class="final-roster-title">The Final 64<span class="final-roster-sub"> &mdash; ranked by community votes</span></span>
       </div>
-      <div class="final-roster-body" id="finalRosterBody">
+      <div class="final-roster-body" id="finalRosterBody" role="region" aria-label="The final 64, ranked by community votes" tabindex="0">
         <ol class="final-roster-list" id="finalRosterList">
-        <li class="fr-row"><span class="fr-rank">#1</span><img class="fr-logo" src="logos/eth.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ETH</span><span class="fr-name">Ethereum</span></li>
-        <li class="fr-row"><span class="fr-rank">#2</span><img class="fr-logo" src="logos/avax.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">AVAX</span><span class="fr-name">Avalanche</span></li>
-        <li class="fr-row"><span class="fr-rank">#3</span><img class="fr-logo" src="logos/pepe.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">PEPE</span><span class="fr-name">Pepe</span></li>
-        <li class="fr-row"><span class="fr-rank">#4</span><img class="fr-logo" src="logos/link.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">LINK</span><span class="fr-name">Chainlink</span></li>
-        <li class="fr-row"><span class="fr-rank">#5</span><img class="fr-logo" src="logos/dai.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">DAI</span><span class="fr-name">Dai</span></li>
-        <li class="fr-row"><span class="fr-rank">#6</span><img class="fr-logo" src="logos/bnb.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">BNB</span><span class="fr-name">BNB</span></li>
-        <li class="fr-row"><span class="fr-rank">#7</span><img class="fr-logo" src="logos/crvusd.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">crvUSD</span><span class="fr-name">crvUSD</span></li>
-        <li class="fr-row"><span class="fr-rank">#8</span><img class="fr-logo" src="logos/usdc.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">USDC</span><span class="fr-name">USDC</span></li>
-        <li class="fr-row"><span class="fr-rank">#9</span><img class="fr-logo" src="logos/shib.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">SHIB</span><span class="fr-name">Shiba Inu</span></li>
-        <li class="fr-row"><span class="fr-rank">#10</span><img class="fr-logo" src="logos/pol.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">POL</span><span class="fr-name">POL (ex-MATIC)</span></li>
-        <li class="fr-row"><span class="fr-rank">#11</span><img class="fr-logo" src="logos/uni.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">UNI</span><span class="fr-name">Uniswap</span></li>
-        <li class="fr-row"><span class="fr-rank">#12</span><img class="fr-logo" src="logos/usdt.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">USDT</span><span class="fr-name">Tether</span></li>
-        <li class="fr-row"><span class="fr-rank">#13</span><img class="fr-logo" src="logos/usde.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">USDe</span><span class="fr-name">Ethena USDe</span></li>
-        <li class="fr-row"><span class="fr-rank">#14</span><img class="fr-logo" src="logos/gho.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">GHO</span><span class="fr-name">GHO</span></li>
-        <li class="fr-row"><span class="fr-rank">#15</span><img class="fr-logo" src="logos/op.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">OP</span><span class="fr-name">Optimism</span></li>
-        <li class="fr-row"><span class="fr-rank">#16</span><img class="fr-logo" src="logos/sei.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">SEI</span><span class="fr-name">Sei</span></li>
-        <li class="fr-row"><span class="fr-rank">#17</span><img class="fr-logo" src="logos/cro.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">CRO</span><span class="fr-name">Cronos</span></li>
-        <li class="fr-row"><span class="fr-rank">#18</span><img class="fr-logo" src="logos/mnt.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">MNT</span><span class="fr-name">Mantle</span></li>
-        <li class="fr-row"><span class="fr-rank">#19</span><img class="fr-logo" src="logos/ena.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ENA</span><span class="fr-name">Ethena</span></li>
-        <li class="fr-row"><span class="fr-rank">#20</span><img class="fr-logo" src="logos/aave.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">AAVE</span><span class="fr-name">Aave</span></li>
-        <li class="fr-row"><span class="fr-rank">#21</span><img class="fr-logo" src="logos/qnt.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">QNT</span><span class="fr-name">Quant</span></li>
-        <li class="fr-row"><span class="fr-rank">#22</span><img class="fr-logo" src="logos/cake.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">CAKE</span><span class="fr-name">PancakeSwap</span></li>
-        <li class="fr-row"><span class="fr-rank">#23</span><img class="fr-logo" src="logos/monad.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">MON</span><span class="fr-name">Monad</span></li>
-        <li class="fr-row"><span class="fr-rank">#24</span><img class="fr-logo" src="logos/sonic.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">S</span><span class="fr-name">Sonic</span></li>
-        <li class="fr-row"><span class="fr-rank">#25</span><img class="fr-logo" src="logos/bera.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">BERA</span><span class="fr-name">Berachain</span></li>
-        <li class="fr-row"><span class="fr-rank">#26</span><img class="fr-logo" src="logos/cbbtc.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">cbBTC</span><span class="fr-name">Coinbase Wrapped BTC</span></li>
-        <li class="fr-row"><span class="fr-rank">#27</span><img class="fr-logo" src="logos/ondo.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ONDO</span><span class="fr-name">Ondo</span></li>
-        <li class="fr-row"><span class="fr-rank">#28</span><img class="fr-logo" src="logos/arb.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ARB</span><span class="fr-name">Arbitrum</span></li>
-        <li class="fr-row"><span class="fr-rank">#29</span><img class="fr-logo" src="logos/crv.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">CRV</span><span class="fr-name">Curve DAO</span></li>
-        <li class="fr-row"><span class="fr-rank">#30</span><img class="fr-logo" src="logos/zro.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ZRO</span><span class="fr-name">LayerZero</span></li>
-        <li class="fr-row"><span class="fr-rank">#31</span><img class="fr-logo" src="logos/comp.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">COMP</span><span class="fr-name">Compound</span></li>
-        <li class="fr-row"><span class="fr-rank">#32</span><img class="fr-logo" src="logos/ape.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">APE</span><span class="fr-name">ApeCoin</span></li>
-        <li class="fr-row"><span class="fr-rank">#33</span><img class="fr-logo" src="logos/hype.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">HYPE</span><span class="fr-name">Hyperliquid</span></li>
-        <li class="fr-row"><span class="fr-rank">#34</span><img class="fr-logo" src="logos/wbtc.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">WBTC</span><span class="fr-name">Wrapped Bitcoin</span></li>
-        <li class="fr-row"><span class="fr-rank">#35</span><img class="fr-logo" src="logos/xaut.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">XAUT</span><span class="fr-name">Tether Gold</span></li>
-        <li class="fr-row"><span class="fr-rank">#36</span><img class="fr-logo" src="logos/flr.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">FLR</span><span class="fr-name">Flare</span></li>
-        <li class="fr-row"><span class="fr-rank">#37</span><img class="fr-logo" src="logos/ens.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ENS</span><span class="fr-name">Ethereum Name Service</span></li>
-        <li class="fr-row"><span class="fr-rank">#38</span><img class="fr-logo" src="logos/kaia.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">KAIA</span><span class="fr-name">Kaia</span></li>
-        <li class="fr-row"><span class="fr-rank">#39</span><img class="fr-logo" src="logos/aster.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ASTER</span><span class="fr-name">Aster</span></li>
-        <li class="fr-row"><span class="fr-rank">#40</span><img class="fr-logo" src="logos/virtual.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">VIRTUAL</span><span class="fr-name">Virtuals Protocol</span></li>
-        <li class="fr-row"><span class="fr-rank">#41</span><img class="fr-logo" src="logos/ethfi.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ETHFI</span><span class="fr-name">Ether.fi</span></li>
-        <li class="fr-row"><span class="fr-rank">#42</span><img class="fr-logo" src="logos/pendle.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">PENDLE</span><span class="fr-name">Pendle</span></li>
-        <li class="fr-row"><span class="fr-rank">#43</span><img class="fr-logo" src="logos/ldo.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">LDO</span><span class="fr-name">Lido DAO</span></li>
-        <li class="fr-row"><span class="fr-rank">#44</span><img class="fr-logo" src="logos/grt.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">GRT</span><span class="fr-name">The Graph</span></li>
-        <li class="fr-row"><span class="fr-rank">#45</span><img class="fr-logo" src="logos/axs.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">AXS</span><span class="fr-name">Axie Infinity</span></li>
-        <li class="fr-row"><span class="fr-rank">#46</span><img class="fr-logo" src="logos/sand.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">SAND</span><span class="fr-name">The Sandbox</span></li>
-        <li class="fr-row"><span class="fr-rank">#47</span><img class="fr-logo" src="logos/bat.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">BAT</span><span class="fr-name">Basic Attention</span></li>
-        <li class="fr-row"><span class="fr-rank">#48</span><img class="fr-logo" src="logos/steth.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">stETH</span><span class="fr-name">Lido Staked Ether</span></li>
-        <li class="fr-row"><span class="fr-rank">#49</span><img class="fr-logo" src="logos/usd1.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">USD1</span><span class="fr-name">USD1</span></li>
-        <li class="fr-row"><span class="fr-rank">#50</span><img class="fr-logo" src="logos/paxg.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">PAXG</span><span class="fr-name">PAX Gold</span></li>
-        <li class="fr-row"><span class="fr-rank">#51</span><img class="fr-logo" src="logos/fet.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">FET</span><span class="fr-name">Artificial Superintelligence Alliance</span></li>
-        <li class="fr-row"><span class="fr-rank">#52</span><img class="fr-logo" src="logos/aero.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">AERO</span><span class="fr-name">Aerodrome Finance</span></li>
-        <li class="fr-row"><span class="fr-rank">#53</span><img class="fr-logo" src="logos/sky.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">SKY</span><span class="fr-name">Sky</span></li>
-        <li class="fr-row"><span class="fr-rank">#54</span><img class="fr-logo" src="logos/dexe.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">DEXE</span><span class="fr-name">DeXe</span></li>
-        <li class="fr-row"><span class="fr-rank">#55</span><img class="fr-logo" src="logos/gno.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">GNO</span><span class="fr-name">Gnosis</span></li>
-        <li class="fr-row"><span class="fr-rank">#56</span><img class="fr-logo" src="logos/wld.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">WLD</span><span class="fr-name">Worldcoin</span></li>
-        <li class="fr-row"><span class="fr-rank">#57</span><img class="fr-logo" src="logos/jasmy.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">JASMY</span><span class="fr-name">JasmyCoin</span></li>
-        <li class="fr-row"><span class="fr-rank">#58</span><img class="fr-logo" src="logos/ath.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ATH</span><span class="fr-name">Aethir</span></li>
-        <li class="fr-row"><span class="fr-rank">#59</span><img class="fr-logo" src="logos/linea.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">LINEA</span><span class="fr-name">Linea</span></li>
-        <li class="fr-row"><span class="fr-rank">#60</span><img class="fr-logo" src="logos/yfi.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">YFI</span><span class="fr-name">yearn.finance</span></li>
-        <li class="fr-row"><span class="fr-rank">#61</span><img class="fr-logo" src="logos/celo.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">CELO</span><span class="fr-name">Celo</span></li>
-        <li class="fr-row"><span class="fr-rank">#62</span><img class="fr-logo" src="logos/blast.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">BLAST</span><span class="fr-name">Blast</span></li>
-        <li class="fr-row"><span class="fr-rank">#63</span><img class="fr-logo" src="logos/glmr.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">GLMR</span><span class="fr-name">Moonbeam</span></li>
-        <li class="fr-row"><span class="fr-rank">#64</span><img class="fr-logo" src="logos/movr.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">MOVR</span><span class="fr-name">Moonriver</span></li>
+        <li class="fr-row"><span class="fr-rank">#1</span><img class="fr-logo" src="logos/eth.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ETH</span><span class="fr-name">Ethereum</span><span class="fr-votes">136 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#2</span><img class="fr-logo" src="logos/link.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">LINK</span><span class="fr-name">Chainlink</span><span class="fr-votes">99 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#3</span><img class="fr-logo" src="logos/pepe.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">PEPE</span><span class="fr-name">Pepe</span><span class="fr-votes">94 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#4</span><img class="fr-logo" src="logos/avax.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">AVAX</span><span class="fr-name">Avalanche</span><span class="fr-votes">93 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#5</span><img class="fr-logo" src="logos/dai.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">DAI</span><span class="fr-name">Dai</span><span class="fr-votes">88 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#6</span><img class="fr-logo" src="logos/bnb.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">BNB</span><span class="fr-name">BNB Chain</span><span class="fr-votes">86 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#7</span><img class="fr-logo" src="logos/crvusd.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">crvUSD</span><span class="fr-name">Curve.Fi USD</span><span class="fr-votes">85 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#8</span><img class="fr-logo" src="logos/usdc.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">USDC</span><span class="fr-name">USDC</span><span class="fr-votes">84 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#9</span><img class="fr-logo" src="logos/usdt.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">USDT</span><span class="fr-name">USDT</span><span class="fr-votes">82 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#10</span><img class="fr-logo" src="logos/shib.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">SHIB</span><span class="fr-name">Shiba Inu</span><span class="fr-votes">81 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#11</span><img class="fr-logo" src="logos/pol.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">POL</span><span class="fr-name">Polygon</span><span class="fr-votes">80 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#12</span><img class="fr-logo" src="logos/uni.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">UNI</span><span class="fr-name">Uniswap</span><span class="fr-votes">78 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#13</span><img class="fr-logo" src="logos/usde.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">USDe</span><span class="fr-name">USDe</span><span class="fr-votes">76 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#14</span><img class="fr-logo" src="logos/gho.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">GHO</span><span class="fr-name">GHO</span><span class="fr-votes">75 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#15</span><img class="fr-logo" src="logos/sei.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">SEI</span><span class="fr-name">Sei</span><span class="fr-votes">74 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#16</span><img class="fr-logo" src="logos/cbbtc.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">cbBTC</span><span class="fr-name">Coinbase Wrapped BTC</span><span class="fr-votes">73 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#17</span><img class="fr-logo" src="logos/op.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">OP</span><span class="fr-name">Optimism</span><span class="fr-votes">72 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#18</span><img class="fr-logo" src="logos/ena.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ENA</span><span class="fr-name">Ethena</span><span class="fr-votes">71 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#18</span><img class="fr-logo" src="logos/paxg.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">PAXG</span><span class="fr-name">PAX Gold</span><span class="fr-votes">71 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#20</span><img class="fr-logo" src="logos/arb.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ARB</span><span class="fr-name">Arbitrum</span><span class="fr-votes">70 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#20</span><img class="fr-logo" src="logos/cro.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">CRO</span><span class="fr-name">Cronos</span><span class="fr-votes">70 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#20</span><img class="fr-logo" src="logos/mnt.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">MNT</span><span class="fr-name">Mantle</span><span class="fr-votes">70 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#20</span><img class="fr-logo" src="logos/xaut.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">XAUt</span><span class="fr-name">Tether Gold</span><span class="fr-votes">70 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#24</span><img class="fr-logo" src="logos/cake.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">Cake</span><span class="fr-name">PancakeSwap Token</span><span class="fr-votes">69 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#24</span><img class="fr-logo" src="logos/ondo.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ONDO</span><span class="fr-name">Ondo Finance</span><span class="fr-votes">69 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#24</span><img class="fr-logo" src="logos/qnt.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">QNT</span><span class="fr-name">Quant</span><span class="fr-votes">69 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#24</span><img class="fr-logo" src="logos/wbtc.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">WBTC</span><span class="fr-name">Wrapped Bitcoin</span><span class="fr-votes">69 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#24</span><img class="fr-logo" src="logos/wld.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">WLD</span><span class="fr-name">Worldcoin</span><span class="fr-votes">69 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#29</span><img class="fr-logo" src="logos/aero.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">AERO</span><span class="fr-name">Aerodrome</span><span class="fr-votes">68 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#29</span><img class="fr-logo" src="logos/crv.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">CRV</span><span class="fr-name">Curve</span><span class="fr-votes">68 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#29</span><img class="fr-logo" src="logos/flr.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">FLR</span><span class="fr-name">Flare</span><span class="fr-votes">68 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#29</span><img class="fr-logo" src="logos/hype.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">HYPE</span><span class="fr-name">Hyperliquid</span><span class="fr-votes">68 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#29</span><img class="fr-logo" src="logos/kaia.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">KAIA</span><span class="fr-name">Kaia</span><span class="fr-votes">68 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#29</span><img class="fr-logo" src="logos/virtual.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">VIRTUAL</span><span class="fr-name">Virtuals Protocol</span><span class="fr-votes">68 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#35</span><img class="fr-logo" src="logos/aave.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">AAVE</span><span class="fr-name">Aave</span><span class="fr-votes">67 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#35</span><img class="fr-logo" src="logos/aster.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ASTER</span><span class="fr-name">Aster</span><span class="fr-votes">67 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#35</span><img class="fr-logo" src="logos/ethfi.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ETHFI</span><span class="fr-name">Ether.fi</span><span class="fr-votes">67 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#35</span><img class="fr-logo" src="logos/monad.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">MON</span><span class="fr-name">Monad</span><span class="fr-votes">67 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#35</span><img class="fr-logo" src="logos/sky.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">SKY</span><span class="fr-name">Sky</span><span class="fr-votes">67 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#40</span><img class="fr-logo" src="logos/bat.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">BAT</span><span class="fr-name">Basic Attention Token</span><span class="fr-votes">66 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#40</span><img class="fr-logo" src="logos/ens.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ENS</span><span class="fr-name">ENS Domains</span><span class="fr-votes">66 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#40</span><img class="fr-logo" src="logos/ldo.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">LDO</span><span class="fr-name">Lido</span><span class="fr-votes">66 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#40</span><img class="fr-logo" src="logos/pendle.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">PENDLE</span><span class="fr-name">Pendle</span><span class="fr-votes">66 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#40</span><img class="fr-logo" src="logos/steth.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">stETH</span><span class="fr-name">Lido Staked ETH</span><span class="fr-votes">66 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#45</span><img class="fr-logo" src="logos/ape.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">APE</span><span class="fr-name">ApeCoin</span><span class="fr-votes">65 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#45</span><img class="fr-logo" src="logos/sonic.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">S</span><span class="fr-name">Sonic</span><span class="fr-votes">65 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#47</span><img class="fr-logo" src="logos/fet.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">FET</span><span class="fr-name">Artificial Superintelligence</span><span class="fr-votes">64 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#47</span><img class="fr-logo" src="logos/sand.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">SAND</span><span class="fr-name">The Sandbox</span><span class="fr-votes">64 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#49</span><img class="fr-logo" src="logos/linea.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">LINEA</span><span class="fr-name">Linea</span><span class="fr-votes">63 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#50</span><img class="fr-logo" src="logos/bera.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">BERA</span><span class="fr-name">Berachain</span><span class="fr-votes">62 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#51</span><img class="fr-logo" src="logos/grt.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">GRT</span><span class="fr-name">The Graph</span><span class="fr-votes">61 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#52</span><img class="fr-logo" src="logos/axs.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">AXS</span><span class="fr-name">Axie Infinity</span><span class="fr-votes">60 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#53</span><img class="fr-logo" src="logos/comp.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">COMP</span><span class="fr-name">Compound</span><span class="fr-votes">59 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#54</span><img class="fr-logo" src="logos/gno.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">GNO</span><span class="fr-name">Gnosis</span><span class="fr-votes">58 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#55</span><img class="fr-logo" src="logos/dexe.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">DEXE</span><span class="fr-name">DeXe</span><span class="fr-votes">57 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#56</span><img class="fr-logo" src="logos/jasmy.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">JASMY</span><span class="fr-name">JasmyCoin</span><span class="fr-votes">56 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#57</span><img class="fr-logo" src="logos/ath.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">ATH</span><span class="fr-name">Aethir</span><span class="fr-votes">55 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#58</span><img class="fr-logo" src="logos/yfi.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">YFI</span><span class="fr-name">yearn.finance</span><span class="fr-votes">54 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#59</span><img class="fr-logo" src="logos/celo.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">CELO</span><span class="fr-name">Celo</span><span class="fr-votes">53 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#60</span><img class="fr-logo" src="logos/usds.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">USDS</span><span class="fr-name">Sky USDS</span><span class="fr-votes">52 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#61</span><img class="fr-logo" src="logos/cvx.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">CVX</span><span class="fr-name">Convex Finance</span><span class="fr-votes">29 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#62</span><img class="fr-logo" src="logos/plume.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">PLUME</span><span class="fr-name">Plume</span><span class="fr-votes">14 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#63</span><img class="fr-logo" src="logos/xpl.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">XPL</span><span class="fr-name">Plasma</span><span class="fr-votes">11 votes</span></li>
+        <li class="fr-row"><span class="fr-rank">#64</span><img class="fr-logo" src="logos/ron.webp" alt="" loading="lazy" width="24" height="24"><span class="fr-sym">RON</span><span class="fr-name">Ronin</span><span class="fr-votes">1 vote</span></li>
         </ol>
       </div>
     </div>
@@ -930,8 +962,7 @@ body{
 
 
   <div class="release-block">
-    <p class="release-label">Expected Release</p>
-    <p class="release-window">August &ndash; September 2026</p>
+    <p class="release-window">Coming Soon</p>
     <a class="release-updates" href="https://punziwars.substack.com/" target="_blank" rel="noopener noreferrer">
       PUNZI Project Updates
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -970,7 +1001,7 @@ body{
 
   <footer class="footer">
     <p>PUNZI is a transparent mathematical game and on-chain experiment. It is not an investment. Smart contracts are immutable and carry inherent risk. Do not play with funds you cannot afford to lose. Participation is at your own risk.</p>
-    <p>By using this site you agree to the Terms &amp; Conditions and acknowledge all Disclaimers.</p>
+    <p>Terms &amp; Conditions and Disclaimers will be available in the dApp at launch.</p>
     <div class="footer-links">
       <a href="https://punzi.xyz" class="footer-url" rel="noopener">punzi.xyz</a>
       <span class="footer-divider" aria-hidden="true">·</span>
@@ -982,7 +1013,7 @@ body{
 
 </main>
 
-<script src="app.js"></script>
+<script src="app.js?v=2"></script>
 <script src="hero-fallback.js"></script>
 
 </body>
